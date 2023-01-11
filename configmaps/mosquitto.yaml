@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  labels:
+    app: mosquitto
+spec: # this is the specification of the pod
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mosquitto
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+    spec: # this is the specification of the containers. Inside speficcations of pods is containers specs
+      containers:
+        - name: mosquitto
+          image: eclipse-mosquitto:latest
+          ports:
+            - containerPort: 1883
+          volumeMounts: # list all the volumes you want to mount from pod to -> container 
+            - name: mosquitto-config
+              mountPath: /mosquitto/config  # path in a fileSystem inside a container ie where do we want the "mosquitto.conf" from config-file.yaml to end up
+ #           - name: secret.file
+ #             mountPath: /mosquitto/secret  # path in a fileSystem inside a container ie where do we want the "secret.file" from secret-file.yaml to end up
+ #             readOnly: true
+          # we are mounting config map volume type into the pod
+      volumes:
+        - name: mosquitto-config
+          configMap:
+            name: mosquitto-config-file
+          # we are mounting secrets volume type into the pod
+        # - name: mosquitto-secret
+        #   secret:
+        #     secretName: mosquitto-secret-file
